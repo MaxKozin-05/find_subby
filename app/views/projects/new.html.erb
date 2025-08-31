@@ -1,2 +1,6 @@
-<h1>Projects#new</h1>
-<p>Find me in app/views/projects/new.html.erb</p>
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-semibold">New Project</h1>
+  <%= link_to 'Back', projects_path, class: 'text-sm underline text-gray-600' %>
+</div>
+
+<%= render 'form', project: @project %>

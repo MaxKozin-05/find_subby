@@ -2,8 +2,7 @@
   <!-- Header -->
   <header class="flex items-center gap-4">
     <% if @profile.logo.attached? %>
-      <%= image_tag @profile.logo.variant(resize_to_limit: [160, 160]),
-                    class: 'h-16 w-16 object-cover rounded-full border' %>
+      <%= image_tag @profile.logo.variant(resize_to_limit: [160, 160]), class: 'h-16 w-16 object-cover rounded-full border' %>
     <% else %>
       <div class="h-16 w-16 rounded-full border bg-gray-100"></div>
     <% end %>
@@ -23,20 +22,6 @@
     </section>
   <% end %>
 
-  <!-- Companies Worked For -->
-  <% if @profile.companies.any? %>
-    <section class="mt-8">
-      <h2 class="text-xl font-semibold mb-3">Companies Worked For</h2>
-      <div class="flex flex-wrap gap-2">
-        <% @profile.companies.each do |name| %>
-          <span class="inline-flex items-center rounded-full border px-3 py-1 text-sm">
-            <%= name %>
-          </span>
-        <% end %>
-      </div>
-    </section>
-  <% end %>
-
   <!-- Projects -->
   <section class="mt-8">
     <h2 class="text-xl font-semibold mb-3">Projects</h2>
@@ -45,8 +30,7 @@
         <% @projects.each do |project| %>
           <div class="rounded-xl overflow-hidden border bg-white">
             <% if project.photos.attached? %>
-              <%= image_tag project.photos.first.variant(resize_to_fill: [600, 400]),
-                            class: 'w-full h-40 object-cover' %>
+              <%= image_tag project.photos.first.variant(resize_to_fill: [600, 400]), class: 'w-full h-40 object-cover' %>
             <% else %>
               <div class="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">No photo</div>
             <% end %>

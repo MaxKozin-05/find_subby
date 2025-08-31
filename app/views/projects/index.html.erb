@@ -1,2 +1,30 @@
-<h1>Projects#index</h1>
-<p>Find me in app/views/projects/index.html.erb</p>
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-semibold">Projects</h1>
+  <%= link_to 'New Project', new_project_path, class: 'px-3 py-2 rounded bg-black text-white' %>
+</div>
+
+<% if @projects.any? %>
+  <div class="grid gap-6 md:grid-cols-3">
+    <% @projects.each do |project| %>
+      <div class="rounded-xl border bg-white overflow-hidden">
+        <% if project.photos.attached? %>
+          <%= image_tag project.photos.first.variant(resize_to_fill: [600, 400]), class: 'w-full h-40 object-cover' %>
+        <% else %>
+          <div class="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">No photo</div>
+        <% end %>
+        <div class="p-4">
+          <h3 class="font-medium"><%= project.title %></h3>
+          <p class="text-sm text-gray-600 line-clamp-3"><%= project.description %></p>
+          <div class="mt-3 flex gap-3 text-sm">
+            <%= link_to 'Edit', edit_project_path(project), class: 'underline' %>
+            <%= link_to 'Delete', project_path(project), data: { turbo_method: :delete, turbo_confirm: 'Delete this project?' }, class: 'text-red-600 underline' %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="rounded-xl border bg-white p-6 text-center text-gray-600">
+    No projects yet. <%= link_to 'Create your first project', new_project_path, class: 'underline' %>.
+  </div>
+<% end %>
