@@ -1,12 +1,12 @@
 <div class="mx-auto max-w-6xl p-6">
   <!-- Header -->
   <header class="flex items-center gap-4">
-    <% if @profile.logo.attached? %>
-      <%= image_tag @profile.logo.variant(resize_to_limit: [160, 160]),
-                    class: 'h-16 w-16 object-cover rounded-full border' %>
-    <% else %>
-      <div class="h-16 w-16 rounded-full border bg-gray-100"></div>
-    <% end %>
+    <%# <% if @profile.logo.attached? %>
+      <%# <%= image_tag @profile.logo.variant(resize_to_limit: [160, 160]), %>
+                    <%# class: 'h-16 w-16 object-cover rounded-full border' %> %>
+    <%# <% else %> %>
+      <%# <div class="h-16 w-16 rounded-full border bg-gray-100"></div> %>
+    <%# <% end %> %>
     <div>
       <h1 class="text-3xl font-semibold"><%= @profile.business_name %></h1>
       <p class="text-gray-600">
