@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_31_062739) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_06_041844) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -52,8 +52,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_31_062739) do
     t.jsonb "companies_json", default: []
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "setup_complete", default: false, null: false
     t.index ["companies_json"], name: "index_profiles_on_companies_json", using: :gin
     t.index ["handle"], name: "index_profiles_on_handle", unique: true
+    t.index ["setup_complete"], name: "index_profiles_on_setup_complete"
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
   end
 
