@@ -1,72 +1,105 @@
-<div class="mx-auto max-w-6xl p-6">
-  <!-- Header -->
-  <header class="flex items-center gap-4">
-    <% if @profile.logo.attached? %>
-      <%= image_tag @profile.logo.variant(resize_to_limit: [160, 160]),
-                    <% class: 'h-16 w-16 object-cover rounded-full border' %>
-    <% else %>
-      <div class="h-16 w-16 rounded-full border bg-gray-100"></div>
-    <% end
-    <div>
-      <h1 class="text-3xl font-semibold"><%= @profile.business_name %></h1>
-      <p class="text-gray-600">
-        <%= @profile.trade_type.presence || "Trade" %>
-        <% if @profile.service_areas.any? %> • <%= @profile.service_areas.join(', ') %><% end %>
-      </p>
-    </div>
-  </header>
+<!-- app/views/dashboard/show.html.erb -->
+<div class="mx-auto max-w-5xl p-6">
+  <h1 class="text-2xl font-semibold">Dashboard</h1>
+  <p class="mt-2 text-gray-600">Welcome, <%= current_user.email %>.</p>
 
-  <!-- About -->
-  <% if @profile.about.present? %>
-    <section class="mt-6 prose max-w-none">
-      <%= simple_format(@profile.about) %>
-    </section>
-  <% end %>
-
-  <!-- Companies Worked For -->
-  <% if @profile.companies.any? %>
-    <section class="mt-8">
-      <h2 class="text-xl font-semibold mb-3">Companies Worked For</h2>
-      <div class="flex flex-wrap gap-2">
-        <% @profile.companies.each do |name| %>
-          <span class="inline-flex items-center rounded-full border px-3 py-1 text-sm">
-            <%= name %>
-          </span>
-        <% end %>
-      </div>
-    </section>
-  <% end %>
-
-  <!-- Projects -->
-  <section class="mt-8">
-    <h2 class="text-xl font-semibold mb-3">Projects</h2>
-    <% if @projects.any? %>
-      <div class="grid gap-4 md:grid-cols-3">
-        <% @projects.each do |project| %>
-          <div class="rounded-xl overflow-hidden border bg-white">
-            <% if project.photos.attached? %>
-              <%= image_tag project.photos.first.variant(resize_to_fill: [600, 400]),
-                            class: 'w-full h-40 object-cover' %>
-            <% else %>
-              <div class="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">No photo</div>
-            <% end %>
-            <div class="p-4">
-              <h3 class="font-medium"><%= project.title %></h3>
-              <p class="text-sm text-gray-600 line-clamp-3"><%= project.description %></p>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <div class="rounded-xl border bg-white p-6 text-center text-gray-600">
-        No projects published yet.
+  <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <%= link_to profile_path, class: "rounded-xl border p-6 hover:shadow-lg transition-shadow bg-white" do %>
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-medium">Profile</h3>
+          <p class="text-sm text-gray-500">View your business profile</p>
+        </div>
       </div>
     <% end %>
-  </section>
 
-  <!-- CTA -->
-  <section class="mt-10">
-    <a href="#job-request" class="px-4 py-2 rounded bg-black text-white">Request a Job</a>
-    <span class="text-gray-500 ml-3">Availability calendar coming soon.</span>
-  </section>
+    <%= link_to projects_path, class: "rounded-xl border p-6 hover:shadow-lg transition-shadow bg-white" do %>
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-medium">Projects</h3>
+          <p class="text-sm text-gray-500">Showcase your work</p>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="rounded-xl border p-6 bg-white opacity-50">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-medium">Quotes</h3>
+          <p class="text-sm text-gray-500">Coming soon</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-xl border p-6 bg-white opacity-50">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="font-medium">Calendar</h3>
+          <p class="text-sm text-gray-500">Coming soon</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="mt-8 bg-white rounded-lg shadow p-6">
+    <h2 class="text-lg font-medium mb-4">Quick Overview</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="text-center">
+        <div class="text-2xl font-bold text-blue-600"><%= current_user.profile&.projects&.count || 0 %></div>
+        <div class="text-sm text-gray-500">Projects</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-green-600">0</div>
+        <div class="text-sm text-gray-500">Active Quotes</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold text-purple-600">0</div>
+        <div class="text-sm text-gray-500">This Month Jobs</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="mt-6">
+    <h2 class="text-lg font-medium mb-4">Quick Actions</h2>
+    <div class="flex flex-wrap gap-3">
+      <!-- KEY FIX: Edit Profile link goes directly to edit (no setup=true) -->
+      <%= link_to edit_profile_path, class: "px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" do %>
+        Edit Profile
+      <% end %>
+
+      <%= link_to new_project_path, class: "px-4 py-2 border border-gray-300 rounded hover:bg-gray-50" do %>
+        Add Project
+      <% end %>
+
+      <% if current_user.profile&.handle.present? %>
+        <%= link_to public_profile_path(current_user.profile.handle),
+            target: "_blank",
+            class: "px-4 py-2 border border-gray-300 rounded hover:bg-gray-50" do %>
+          View Public Profile
+        <% end %>
+      <% end %>
+    </div>
+  </div>
 </div>

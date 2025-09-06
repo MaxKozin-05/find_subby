@@ -1,3 +1,4 @@
+# app/models/profile.rb
 class Profile < ApplicationRecord
   belongs_to :user
   has_many  :projects, dependent: :destroy
@@ -12,11 +13,23 @@ class Profile < ApplicationRecord
   def companies
     Array(companies_json)
   end
+
   def companies=(arr)
     self.companies_json = Array(arr).map(&:to_s).map(&:strip).reject(&:blank?)
   end
 
+  # Check if the profile has been set up properly
+  def setup_complete?
+    setup_complete && business_name.present? && trade_type.present?
+  end
+
+  # Check if profile is ready for public display
+  def public_ready?
+    setup_complete? && about.present?
+  end
+
   private
+
   def ensure_handle
     return if handle.present? && handle.match?(/\A[a-z0-9\-]+\z/)
     base = (business_name.presence || user&.email&.split('@')&.first || 'profile').parameterize
