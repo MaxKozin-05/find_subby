@@ -1,19 +1,13 @@
 Rails.application.routes.draw do
-  get 'projects/index'
-  get 'projects/new'
-  get 'projects/create'
-  get 'projects/edit'
-  get 'projects/update'
-  get 'projects/destroy'
-  get 'profiles/show'
-  get 'profiles/edit'
-  get 'profiles/update'
   devise_for :users
 
-
   authenticate :user do
-    resource :dashboard, only: :show
+    resource  :profile
+    resources :projects
+    resource  :dashboard, only: :show
   end
+
+  get '/s/:handle', to: 'public/profiles#show', as: :public_profile
 
   root 'home#index'
 

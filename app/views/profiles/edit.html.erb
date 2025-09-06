@@ -1,2 +1,99 @@
-<h1>Profiles#edit</h1>
-<p>Find me in app/views/profiles/edit.html.erb</p>
+<!-- app/views/profiles/edit.html.erb -->
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+  <!-- Header -->
+  <div class="flex items-center justify-between gap-4">
+    <h1 class="text-2xl font-semibold">Your Profile</h1>
+    <%= link_to "Preview Public Profile",
+      public_profile_path(handle: (@profile.handle.presence || "your-handle")),
+      target: "_blank",
+      class: "inline-flex items-center rounded-lg border border-gray-300 px-3 py-2 text-sm hover:bg-gray-50" %>
+  </div>
+
+  <%= form_with model: @profile, url: profile_path, method: :put,
+                html: { multipart: true }, class: "mt-6 space-y-8" do |f| %>
+
+    <% base_input = "mt-1 block w-full rounded-lg border-gray-300 bg-white shadow-sm focus:border-black focus:ring-2 focus:ring-black p-2.5" %>
+
+    <!-- Basics -->
+    <section class="rounded-xl border border-gray-200 bg-white shadow-sm p-6">
+      <h2 class="text-lg font-semibold">Basics</h2>
+      <p class="text-sm text-gray-500 mt-1">These details appear on your public mini-site.</p>
+
+      <div class="mt-6 grid gap-6 md:grid-cols-2">
+        <div>
+          <%= f.label :business_name, class: "block text-sm font-medium text-gray-800" %>
+          <%= f.text_field :business_name, class: base_input, required: true %>
+        </div>
+
+        <div>
+          <%= f.label :handle, "Public Handle (URL)", class: "block text-sm font-medium text-gray-800" %>
+          <div class="mt-1 flex items-center gap-2">
+            <span class="text-gray-500 text-sm select-none">/s/</span>
+            <%= f.text_field :handle, class: "#{base_input} flex-1", placeholder: "smith-tiling" %>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">Lowercase letters, numbers, dashes.</p>
+        </div>
+
+        <div>
+          <%= f.label :trade_type, class: "block text-sm font-medium text-gray-800" %>
+          <%= f.text_field :trade_type, placeholder: "Carpenter, Plumber…", class: base_input %>
+        </div>
+
+        <div>
+          <%= f.label :service_area_text, "Service Areas", class: "block text-sm font-medium text-gray-800" %>
+          <%= text_field_tag :"profile[service_area_text]",
+                             @profile.service_areas.join(", "),
+                             class: base_input,
+                             placeholder: "Melbourne, Geelong, Mornington" %>
+          <p class="text-xs text-gray-500 mt-1">Comma-separated list.</p>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <%= f.label :about, class: "block text-sm font-medium text-gray-800" %>
+        <%= f.text_area :about, rows: 5, class: base_input, placeholder: "Tell clients about your trade, experience, and what sets you apart." %>
+      </div>
+    </section>
+
+    <!-- Logo -->
+    <section class="rounded-xl border border-gray-200 bg-white shadow-sm p-6">
+      <h2 class="text-lg font-semibold">Logo</h2>
+      <p class="text-sm text-gray-500 mt-1">PNG/JPG recommended. Square works best.</p>
+
+      <div class="mt-4 flex items-center gap-5">
+        <div>
+          <%= f.file_field :logo, accept: "image/*", class: "block text-sm" %>
+        </div>
+        <% if @profile.logo.attached? %>
+          <div class="h-20 w-20 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 shadow-sm">
+            <%= image_tag @profile.logo.variant(resize_to_fill: [160,160]),
+                          class: "h-full w-full object-cover" %>
+          </div>
+        <% end %>
+      </div>
+    </section>
+
+    <!-- Companies -->
+    <section class="rounded-xl border border-gray-200 bg-white shadow-sm p-6">
+      <h2 class="text-lg font-semibold">Companies Worked For</h2>
+      <p class="text-sm text-gray-500 mt-1">Enter company names separated by commas or new lines.</p>
+
+      <div class="mt-4">
+        <%= text_area_tag :"profile[companies_text]",
+                          @profile.companies.join(", "),
+                          rows: 4,
+                          class: base_input,
+                          placeholder: "Lendlease, CPB, Multiplex" %>
+        <p class="text-xs text-gray-500 mt-2">Tip: put each company on its own line for long lists.</p>
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+      <%= f.submit "Save Profile",
+            class: "inline-flex justify-center rounded-lg bg-black px-4 py-2 text-white shadow-sm hover:opacity-90" %>
+      <%= link_to "Cancel", dashboard_path,
+            class: "inline-flex justify-center rounded-lg border border-gray-300 px-4 py-2 hover:bg-gray-50" %>
+    </div>
+  <% end %>
+</div>
