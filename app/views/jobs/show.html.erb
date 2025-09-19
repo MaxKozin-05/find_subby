@@ -1,0 +1,182 @@
+<!-- app/views/jobs/show.html.erb -->
+<div class="max-w-4xl mx-auto p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <%= link_to jobs_path, class: "text-blue-600 hover:text-blue-700 text-sm flex items-center gap-1 mb-2" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Jobs
+      <% end %>
+      <h1 class="text-2xl font-semibold text-gray-900"><%= @job.title %></h1>
+    </div>
+
+    <span class="px-4 py-2 text-sm font-medium rounded-full
+      <%= case @job.status
+          when 'lead' then 'bg-yellow-100 text-yellow-800'
+          when 'contacted' then 'bg-blue-100 text-blue-800'
+          when 'quoted' then 'bg-purple-100 text-purple-800'
+          when 'accepted' then 'bg-green-100 text-green-800'
+          when 'in_progress' then 'bg-indigo-100 text-indigo-800'
+          when 'completed' then 'bg-emerald-100 text-emerald-800'
+          when 'declined' then 'bg-red-100 text-red-800'
+          when 'cancelled' then 'bg-gray-100 text-gray-800'
+          else 'bg-gray-100 text-gray-800'
+          end %>">
+      <%= @job.status.humanize %>
+    </span>
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <!-- Main Content -->
+    <div class="lg:col-span-2">
+      <!-- Job Details -->
+      <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Job Details</h2>
+
+        <% if @job.description.present? %>
+          <div class="mb-6">
+            <h3 class="font-medium text-gray-900 mb-2">Description</h3>
+            <div class="text-gray-700 whitespace-pre-wrap"><%= simple_format(@job.description) %></div>
+          </div>
+        <% end %>
+
+        <div class="grid gap-4 sm:grid-cols-2">
+          <% if @job.estimated_budget.present? %>
+            <div>
+              <h3 class="font-medium text-gray-900 mb-1">Estimated Budget</h3>
+              <p class="text-gray-700"><%= number_to_currency(@job.estimated_budget) %></p>
+            </div>
+          <% end %>
+
+          <% if @job.preferred_start_date.present? %>
+            <div>
+              <h3 class="font-medium text-gray-900 mb-1">Preferred Start Date</h3>
+              <p class="text-gray-700"><%= @job.preferred_start_date.strftime("%B %d, %Y") %></p>
+            </div>
+          <% end %>
+
+          <% if @job.location.present? %>
+            <div>
+              <h3 class="font-medium text-gray-900 mb-1">Location</h3>
+              <p class="text-gray-700"><%= @job.location %></p>
+            </div>
+          <% end %>
+
+          <div>
+            <h3 class="font-medium text-gray-900 mb-1">Submitted</h3>
+            <p class="text-gray-700">
+              <%= @job.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+              (<%= time_ago_in_words(@job.created_at) %> ago)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status Update Form -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4">Update Status</h2>
+
+        <%= form_with model: @job, local: true, html: { class: "space-y-4" } do |f| %>
+          <div>
+            <%= f.label :status, "Job Status", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= f.select :status,
+                options_for_select([
+                  ['New Lead', 'lead'],
+                  ['Contacted Client', 'contacted'],
+                  ['Quote Sent', 'quoted'],
+                  ['Job Accepted', 'accepted'],
+                  ['Work In Progress', 'in_progress'],
+                  ['Job Completed', 'completed'],
+                  ['Declined', 'declined'],
+                  ['Cancelled', 'cancelled']
+                ], @job.status),
+                {},
+                { class: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" } %>
+          </div>
+
+          <div class="flex gap-3">
+            <%= f.submit "Update Status",
+                class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium" %>
+            <%= link_to "Cancel", @job,
+                class: "px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Client Information -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4">Client Information</h2>
+
+        <div class="space-y-3">
+          <div>
+            <h3 class="font-medium text-gray-900 mb-1">Name</h3>
+            <p class="text-gray-700"><%= @job.client_name %></p>
+          </div>
+
+          <div>
+            <h3 class="font-medium text-gray-900 mb-1">Email</h3>
+            <p class="text-gray-700">
+              <%= link_to @job.client_email, "mailto:#{@job.client_email}",
+                  class: "text-blue-600 hover:text-blue-700" %>
+            </p>
+          </div>
+
+          <% if @job.client_phone.present? %>
+            <div>
+              <h3 class="font-medium text-gray-900 mb-1">Phone</h3>
+              <p class="text-gray-700">
+                <%= link_to @job.client_phone, "tel:#{@job.client_phone}",
+                    class: "text-blue-600 hover:text-blue-700" %>
+              </p>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="mt-6 space-y-2">
+          <%= link_to "mailto:#{@job.client_email}?subject=Re: #{@job.title}",
+              class: "w-full inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Send Email
+          <% end %>
+
+          <% if @job.client_phone.present? %>
+            <%= link_to "tel:#{@job.client_phone}",
+                class: "w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              Call Client
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Job Timeline -->
+      <div class="bg-white rounded-lg shadow p-6">
+        <h2 class="text-lg font-semibold mb-4">Timeline</h2>
+
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+            <div>
+              <p class="font-medium text-gray-900">Job Submitted</p>
+              <p class="text-sm text-gray-500">
+                <%= @job.created_at.strftime("%b %d, %Y at %I:%M %p") %>
+              </p>
+            </div>
+          </div>
+
+          <!-- Additional timeline entries would go here based on status changes -->
+          <!-- This could be enhanced with a status_changes table to track history -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

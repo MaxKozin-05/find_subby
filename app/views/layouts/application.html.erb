@@ -1,3 +1,4 @@
+<!-- app/views/layouts/application.html.erb (updated navigation section) -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,27 +7,74 @@
   <%= csp_meta_tag %>
   <%= javascript_include_tag 'application', defer: true %>
   <%= stylesheet_link_tag 'application', 'data-turbo-track': 'reload' %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
 </head>
   <body class="min-h-screen bg-gray-50">
     <nav class="border-b bg-white">
       <div class="mx-auto max-w-6xl p-4 flex items-center justify-between">
-        <%= link_to 'FindSubby', root_path, class: 'font-semibold' %>
-        <div class="space-x-4">
+        <%= link_to 'FindSubby', root_path, class: 'font-semibold text-xl' %>
+
+        <div class="flex items-center space-x-4">
           <% if user_signed_in? %>
-          <%= link_to 'Dashboard', dashboard_path, class: 'text-sm' %>
-          <%= link_to 'Log out', destroy_user_session_path, data: { turbo_method: :delete }, class: 'text-sm' %>
+            <%= link_to dashboard_path, class: 'text-sm hover:text-blue-600 transition-colors' do %>
+              Dashboard
+            <% end %>
+
+            <%= link_to jobs_path, class: 'text-sm hover:text-blue-600 transition-colors' do %>
+              Jobs
+            <% end %>
+
+            <%= link_to projects_path, class: 'text-sm hover:text-blue-600 transition-colors' do %>
+              Projects
+            <% end %>
+
+            <!-- Notifications with badge -->
+            <%= link_to notifications_path, class: 'relative p-2 hover:bg-gray-100 rounded-lg transition-colors' do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zm-7.5 1A7.5 7.5 0 104 9.5a7.5 7.5 0 008.5 8.5z"/>
+              </svg>
+              <% if current_user.unread_notifications_count > 0 %>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  <%= current_user.unread_notifications_count > 9 ? '9+' : current_user.unread_notifications_count %>
+                </span>
+              <% end %>
+            <% end %>
+
+            <!-- Profile dropdown could go here -->
+            <div class="relative">
+              <%= link_to profile_path, class: 'text-sm hover:text-blue-600 transition-colors' do %>
+                Profile
+              <% end %>
+            </div>
+
+            <%= link_to destroy_user_session_path, data: { turbo_method: :delete },
+                class: 'text-sm text-red-600 hover:text-red-700 transition-colors' do %>
+              Log out
+            <% end %>
           <% else %>
-          <%= link_to 'Log in', new_user_session_path, class: 'text-sm' %>
-          <%= link_to 'Sign up', new_user_registration_path, class: 'text-sm' %>
+            <%= link_to 'Log in', new_user_session_path, class: 'text-sm hover:text-blue-600 transition-colors' %>
+            <%= link_to 'Sign up', new_user_registration_path, class: 'text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors' %>
           <% end %>
         </div>
       </div>
     </nav>
+
     <% flash.each do |type, msg| %>
-    <div class="mx-auto max-w-6xl p-4 text-sm text-white <%= type == 'alert' ? 'bg-red-600' : 'bg-green-600' %>"><%= msg %></div>
+      <div class="mx-auto max-w-6xl p-4">
+        <div class="text-sm text-white px-4 py-3 rounded-lg
+          <%= case type.to_s
+              when 'alert' then 'bg-red-600'
+              when 'error' then 'bg-red-600'
+              when 'notice' then 'bg-green-600'
+              when 'success' then 'bg-green-600'
+              else 'bg-blue-600'
+              end %>">
+          <%= msg %>
+        </div>
+      </div>
     <% end %>
-    <main class="mx-auto max-w-6xl p-6">
+
+    <main>
       <%= yield %>
     </main>
   </body>

@@ -1,3 +1,4 @@
+<!-- app/views/public/profiles/show.html.erb (updated) -->
 <div class="mx-auto max-w-6xl p-6">
   <!-- Header -->
   <header class="flex items-center gap-4">
@@ -48,9 +49,66 @@
     <% end %>
   </section>
 
-  <!-- CTA -->
-  <section class="mt-10">
-    <a href="#job-request" class="px-4 py-2 rounded bg-black text-white">Request a Job</a>
-    <span class="text-gray-500 ml-3">Availability calendar coming soon.</span>
+  <!-- Job Request Form -->
+  <section class="mt-12">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold mb-4">Request a Quote</h2>
+
+      <%= form_with model: Job.new, url: public_profile_jobs_path(@profile.handle),
+          local: true, html: { class: 'space-y-4', 'data-turbo': 'false' } do |f| %>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <%= f.label :client_name, "Your Name", class: "block text-sm font-medium mb-2" %>
+            <%= f.text_field :client_name, class: "w-full p-3 border rounded-lg", required: true %>
+          </div>
+
+          <div>
+            <%= f.label :client_email, "Email", class: "block text-sm font-medium mb-2" %>
+            <%= f.email_field :client_email, class: "w-full p-3 border rounded-lg", required: true %>
+          </div>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <%= f.label :client_phone, "Phone (optional)", class: "block text-sm font-medium mb-2" %>
+            <%= f.number_field  :client_phone, class: "w-full p-3 border rounded-lg" %>
+          </div>
+
+          <div>
+            <%= f.label :estimated_budget, "Estimated Budget ($)", class: "block text-sm font-medium mb-2" %>
+            <%= f.number_field :estimated_budget, step: 0.01, class: "w-full p-3 border rounded-lg" %>
+          </div>
+        </div>
+
+        <div>
+          <%= f.label :title, "Project Title", class: "block text-sm font-medium mb-2" %>
+          <%= f.text_field :title, class: "w-full p-3 border rounded-lg",
+              placeholder: "e.g., Kitchen renovation, Bathroom tiling", required: true %>
+        </div>
+
+        <div>
+          <%= f.label :description, "Project Description", class: "block text-sm font-medium mb-2" %>
+          <%= f.text_area :description, rows: 4, class: "w-full p-3 border rounded-lg",
+              placeholder: "Please describe your project in detail..." %>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          <div>
+            <%= f.label :location, "Location", class: "block text-sm font-medium mb-2" %>
+            <%= f.text_field :location, class: "w-full p-3 border rounded-lg",
+                placeholder: "Project address or suburb" %>
+          </div>
+
+          <div>
+            <%= f.label :preferred_start_date, "Preferred Start Date", class: "block text-sm font-medium mb-2" %>
+            <%= f.date_field :preferred_start_date, class: "w-full p-3 border rounded-lg" %>
+          </div>
+        </div>
+
+        <%= f.submit "Request Quote",
+            class: "w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-medium" %>
+      <% end %>
+    </div>
   </section>
 </div>
