@@ -1,0 +1,103 @@
+<!-- app/views/notifications/index.html.erb -->
+<div class="max-w-4xl mx-auto p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold">Notifications</h1>
+
+    <div class="flex gap-3">
+      <% if current_user.unread_notifications_count > 0 %>
+        <%= link_to mark_all_read_notifications_path, method: :patch,
+            class: "px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50" do %>
+          Mark All Read
+        <% end %>
+      <% end %>
+
+      <div class="flex gap-1">
+        <%= link_to notifications_path,
+            class: "px-3 py-2 text-sm rounded-lg #{params[:unread] != 'true' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" do %>
+          All
+        <% end %>
+        <%= link_to notifications_path(unread: true),
+            class: "px-3 py-2 text-sm rounded-lg #{params[:unread] == 'true' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" do %>
+          Unread (<%= current_user.unread_notifications_count %>)
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <% if @notifications.any? %>
+    <div class="space-y-2">
+      <% @notifications.each do |notification| %>
+        <div class="bg-white rounded-lg border <%= notification.read? ? 'bg-gray-50' : 'border-blue-200 bg-blue-50' %>">
+          <%= link_to notification_path(notification), method: :patch,
+              class: "block p-4 hover:bg-gray-50 transition-colors" do %>
+
+            <div class="flex items-start justify-between">
+              <div class="flex items-start gap-3">
+                <!-- Notification Icon -->
+                <div class="w-10 h-10 rounded-lg flex items-center justify-center <%= notification.read? ? 'bg-gray-100' : 'bg-blue-100' %>">
+                  <% case notification.notification_type %>
+                  <% when 'new_job' %>
+                    <svg class="w-5 h-5 <%= notification.read? ? 'text-gray-600' : 'text-blue-600' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  <% else %>
+                    <svg class="w-5 h-5 <%= notification.read? ? 'text-gray-600' : 'text-blue-600' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zm-7.5 1A7.5 7.5 0 104 9.5a7.5 7.5 0 008.5 8.5z"/>
+                    </svg>
+                  <% end %>
+                </div>
+
+                <!-- Notification Content -->
+                <div class="flex-1">
+                  <h3 class="font-medium <%= notification.read? ? 'text-gray-900' : 'text-blue-900' %>">
+                    <%= notification.title %>
+                  </h3>
+                  <% if notification.message.present? %>
+                    <p class="text-sm <%= notification.read? ? 'text-gray-600' : 'text-blue-700' %> mt-1">
+                      <%= notification.message %>
+                    </p>
+                  <% end %>
+
+                  <!-- Related object info -->
+                  <% if notification.notifiable.is_a?(Job) %>
+                    <div class="flex items-center gap-4 mt-2 text-xs <%= notification.read? ? 'text-gray-500' : 'text-blue-600' %>">
+                      <span>Job Request</span>
+                      <span>Budget: <%= notification.notifiable.display_budget %></span>
+                      <% if notification.notifiable.location.present? %>
+                        <span><%= truncate(notification.notifiable.location, length: 20) %></span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- Timestamp and unread indicator -->
+              <div class="flex items-center gap-2 ml-4">
+                <span class="text-sm <%= notification.read? ? 'text-gray-500' : 'text-blue-600' %>">
+                  <%= notification.time_ago %>
+                </span>
+                <% unless notification.read? %>
+                  <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zm-7.5 1A7.5 7.5 0 104 9.5a7.5 7.5 0 008.5 8.5z"/>
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No notifications</h3>
+      <p class="mt-1 text-sm text-gray-500">
+        <% if params[:unread] == 'true' %>
+          You have no unread notifications.
+        <% else %>
+          You don't have any notifications yet.
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+</div>

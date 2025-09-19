@@ -1,4 +1,4 @@
-# config/routes.rb - Alternative cleaner approach
+# config/routes.rb (updated)
 Rails.application.routes.draw do
   devise_for :users
 
@@ -6,10 +6,17 @@ Rails.application.routes.draw do
     get '/dashboard', to: 'dashboard#show', as: :dashboard
     resource :profile, only: [:show, :edit, :update]
     resources :projects
+    resources :jobs, only: [:index, :show, :update, :new, :create]
+    resources :notifications, only: [:index, :update] do
+      collection do
+        patch :mark_all_read
+      end
+    end
   end
 
-  # Public mini-sites - just use the short route, no namespace needed
+  # Public routes
   get '/s/:handle', to: 'public/profiles#show', as: :public_profile
+  post '/s/:handle/jobs', to: 'public/jobs#create', as: :public_profile_jobs
 
   root 'home#index'
 

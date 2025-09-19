@@ -1,0 +1,202 @@
+<!-- app/views/job_mailer/new_job_request.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Job Request</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #2563eb; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+    .content { background: #f8f9fa; padding: 20px; }
+    .job-details { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
+    .button { background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; }
+    .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>New Job Request Received!</h1>
+    </div>
+
+    <div class="content">
+      <p>Hi <%= @user.email %>,</p>
+
+      <p>You've received a new job request through your FindSubby profile:</p>
+
+      <div class="job-details">
+        <h2><%= @job.title %></h2>
+
+        <p><strong>From:</strong> <%= @job.client_name %></p>
+        <p><strong>Email:</strong> <%= @job.client_email %></p>
+        <% if @job.client_phone.present? %>
+          <p><strong>Phone:</strong> <%= @job.client_phone %></p>
+        <% end %>
+        <% if @job.estimated_budget.present? %>
+          <p><strong>Budget:</strong> <%= number_to_currency(@job.estimated_budget) %></p>
+        <% end %>
+        <% if @job.location.present? %>
+          <p><strong>Location:</strong> <%= @job.location %></p>
+        <% end %>
+        <% if @job.preferred_start_date.present? %>
+          <p><strong>Preferred Start:</strong> <%= @job.preferred_start_date.strftime("%B %d, %Y") %></p>
+        <% end %>
+
+        <% if @job.description.present? %>
+          <p><strong>Description:</strong></p>
+          <div style="background: #f1f5f9; padding: 15px; border-radius: 6px; margin-top: 10px;">
+            <%= simple_format(@job.description) %>
+          </div>
+        <% end %>
+      </div>
+
+      <p style="text-align: center; margin: 30px 0;">
+        <%= link_to "View Job Details", job_url(@job), class: "button" %>
+      </p>
+
+      <p><strong>Next Steps:</strong></p>
+      <ul>
+        <li>Review the job details</li>
+        <li>Contact the client to discuss requirements</li>
+        <li>Provide a quote if interested</li>
+        <li>Update the job status in your dashboard</li>
+      </ul>
+    </div>
+
+    <div class="footer">
+      <p>Best regards,<br>The FindSubby Team</p>
+      <p>
+        <%= link_to "Login to Dashboard", dashboard_url %>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+
+<!-- app/views/job_mailer/new_job_request.text.erb -->
+New Job Request Received!
+
+Hi <%= @user.email %>,
+
+You've received a new job request through your FindSubby profile:
+
+Job: <%= @job.title %>
+From: <%= @job.client_name %>
+Email: <%= @job.client_email %>
+<% if @job.client_phone.present? %>Phone: <%= @job.client_phone %><% end %>
+<% if @job.estimated_budget.present? %>Budget: <%= number_to_currency(@job.estimated_budget) %><% end %>
+<% if @job.location.present? %>Location: <%= @job.location %><% end %>
+<% if @job.preferred_start_date.present? %>Preferred Start: <%= @job.preferred_start_date.strftime("%B %d, %Y") %><% end %>
+
+<% if @job.description.present? %>
+Description:
+<%= @job.description %>
+<% end %>
+
+View job details: <%= job_url(@job) %>
+
+Next Steps:
+- Review the job details
+- Contact the client to discuss requirements
+- Provide a quote if interested
+- Update the job status in your dashboard
+
+Best regards,
+The FindSubby Team
+
+Dashboard: <%= dashboard_url %>
+
+---
+
+<!-- app/views/job_mailer/job_status_update.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Status Update</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: #2563eb; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
+    .content { background: #f8f9fa; padding: 20px; }
+    .status-update { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #10b981; }
+    .footer { text-align: center; margin-top: 20px; color: #666; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Update on Your Job Request</h1>
+    </div>
+
+    <div class="content">
+      <p>Hi <%= @job.client_name %>,</p>
+
+      <div class="status-update">
+        <h2><%= @job.title %></h2>
+
+        <p><strong>Status Update:</strong> <%= @job.status.humanize %></p>
+
+        <% case @job.status %>
+        <% when 'contacted' %>
+          <p>We've received your job request and will be in touch shortly to discuss the details and schedule a consultation.</p>
+        <% when 'quoted' %>
+          <p>We've prepared a quote for your project. Please check your email for the detailed quote or contact us directly.</p>
+        <% when 'accepted' %>
+          <p>Great news! We've accepted your project and are excited to work with you. We'll be in touch soon to schedule the work.</p>
+        <% when 'declined' %>
+          <p>Thank you for considering us for your project. Unfortunately, we're unable to take on this job at this time. We appreciate your interest and wish you the best with your project.</p>
+        <% else %>
+          <p>Your job request has been updated. We'll keep you informed of any changes to the status.</p>
+        <% end %>
+
+        <p><strong>Contractor:</strong> <%= @profile.business_name %></p>
+        <% if @profile.user.email.present? %>
+          <p><strong>Contact:</strong> <%= @profile.user.email %></p>
+        <% end %>
+      </div>
+
+      <p>If you have any questions about your project, please don't hesitate to reach out.</p>
+    </div>
+
+    <div class="footer">
+      <p>Best regards,<br><%= @profile.business_name %></p>
+      <p>Powered by FindSubby</p>
+    </div>
+  </div>
+</body>
+</html>
+
+<!-- app/views/job_mailer/job_status_update.text.erb -->
+Update on Your Job Request
+
+Hi <%= @job.client_name %>,
+
+Your job request "<%= @job.title %>" has been updated.
+
+Status: <%= @job.status.humanize %>
+
+<% case @job.status %>
+<% when 'contacted' %>
+We've received your job request and will be in touch shortly to discuss the details and schedule a consultation.
+<% when 'quoted' %>
+We've prepared a quote for your project. Please check your email for the detailed quote or contact us directly.
+<% when 'accepted' %>
+Great news! We've accepted your project and are excited to work with you. We'll be in touch soon to schedule the work.
+<% when 'declined' %>
+Thank you for considering us for your project. Unfortunately, we're unable to take on this job at this time. We appreciate your interest and wish you the best with your project.
+<% else %>
+Your job request has been updated. We'll keep you informed of any changes to the status.
+<% end %>
+
+Contractor: <%= @profile.business_name %>
+<% if @profile.user.email.present? %>Contact: <%= @profile.user.email %><% end %>
+
+If you have any questions about your project, please don't hesitate to reach out.
+
+Best regards,
+<%= @profile.business_name %>
+Powered by FindSubby
