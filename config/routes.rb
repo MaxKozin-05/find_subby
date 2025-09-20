@@ -12,8 +12,15 @@ Rails.application.routes.draw do
         patch :mark_all_read
       end
     end
-  end
 
+    # Calendar routes
+    resources :calendar_days do
+      collection do
+        post :toggle
+        post :bulk_update
+      end
+    end
+  end
   # Public routes
   get '/s/:handle', to: 'public/profiles#show', as: :public_profile
   post '/s/:handle/jobs', to: 'public/jobs#create', as: :public_profile_jobs

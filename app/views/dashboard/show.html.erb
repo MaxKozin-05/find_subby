@@ -122,20 +122,20 @@
       </div>
     <% end %>
 
-    <div class="rounded-xl border p-6 bg-white opacity-50">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-          <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <div>
-          <h3 class="font-medium">Calendar</h3>
-          <p class="text-sm text-gray-500">Coming soon</p>
-        </div>
+    <!-- Add this card to the navigation cards section -->
+  <%= link_to calendar_days_path, class: "rounded-xl border p-6 hover:shadow-lg transition-shadow bg-white" do %>
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="font-medium">Calendar</h3>
+        <p class="text-sm text-gray-500">Manage availability</p>
       </div>
     </div>
-  </div>
+  <% end %>
 
   <!-- Recent Job Requests -->
   <div class="mt-8 bg-white rounded-lg shadow p-6">
