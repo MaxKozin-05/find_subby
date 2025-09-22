@@ -7,14 +7,19 @@ export default class extends Controller {
 
   connect() {
     console.log("Calendar controller connected")
+    console.log("Year value:", this.yearValue)
+    console.log("Month value:", this.monthValue)
+    console.log("Day targets found:", this.dayTargets.length)
     this.selectedDays = new Set()
   }
 
   toggleDay(event) {
+    console.log("toggleDay called", event)
     const dayElement = event.currentTarget
     const date = dayElement.dataset.date
     const currentState = dayElement.dataset.state
     const source = dayElement.dataset.source
+    console.log("Date:", date, "State:", currentState, "Source:", source)
 
     // Don't allow toggling booked days (they come from jobs)
     if (source === 'job') {

@@ -3,6 +3,9 @@ class CalendarDaysController < ApplicationController
   before_action :set_calendar_day, only: [:show, :update, :destroy]
 
   def index
+    # Skip Pundit policy scope since we're using our own service
+    skip_policy_scope
+
     @year = params[:year]&.to_i || Date.current.year
     @month = params[:month]&.to_i || Date.current.month
 
