@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_one :profile, dependent: :destroy
   has_many :jobs, dependent: :destroy
   has_many :notifications, dependent: :destroy
+  has_many :calendar_days, dependent: :destroy
 
   def unread_notifications_count
     notifications.unread.count

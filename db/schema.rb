@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_09_11_015723) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_20_042347) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -40,6 +40,19 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_11_015723) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "calendar_days", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.date "day", null: false
+    t.integer "state", default: 0, null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["day"], name: "index_calendar_days_on_day"
+    t.index ["state"], name: "index_calendar_days_on_state"
+    t.index ["user_id", "day"], name: "index_calendar_days_on_user_id_and_day", unique: true
+    t.index ["user_id"], name: "index_calendar_days_on_user_id"
   end
 
   create_table "dashboards", force: :cascade do |t|
@@ -123,6 +136,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_11_015723) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "calendar_days", "users"
   add_foreign_key "jobs", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "profiles", "users"

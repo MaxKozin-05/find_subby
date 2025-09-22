@@ -1,53 +1,67 @@
 <!-- app/views/public/profiles/show.html.erb (updated) -->
 <div class="mx-auto max-w-6xl p-6">
-  <!-- Header -->
-  <header class="flex items-center gap-4">
-    <% if @profile.logo.attached? %>
-      <%= image_tag @profile.logo.variant(resize_to_limit: [160, 160]), class: 'h-16 w-16 object-cover rounded-full border' %>
-    <% else %>
-      <div class="h-16 w-16 rounded-full border bg-gray-100"></div>
-    <% end %>
-    <div>
-      <h1 class="text-3xl font-semibold"><%= @profile.business_name %></h1>
-      <p class="text-gray-600">
-        <%= @profile.trade_type.presence || "Trade" %>
-        <% if @profile.service_areas.any? %> • <%= @profile.service_areas.join(', ') %><% end %>
-      </p>
-    </div>
-  </header>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main content -->
+    <div class="lg:col-span-2">
+      <!-- Header -->
+      <header class="flex items-center gap-4">
+        <% if @profile.logo.attached? %>
+          <%= image_tag @profile.logo.variant(resize_to_limit: [160, 160]), class: 'h-16 w-16 object-cover rounded-full border' %>
+        <% else %>
+          <div class="h-16 w-16 rounded-full border bg-gray-100"></div>
+        <% end %>
+        <div>
+          <h1 class="text-3xl font-semibold"><%= @profile.business_name %></h1>
+          <p class="text-gray-600">
+            <%= @profile.trade_type.presence || "Trade" %>
+            <% if @profile.service_areas.any? %> • <%= @profile.service_areas.join(', ') %><% end %>
+          </p>
+        </div>
+      </header>
 
-  <!-- About -->
-  <% if @profile.about.present? %>
-    <section class="mt-6 prose max-w-none">
-      <%= simple_format(@profile.about) %>
-    </section>
-  <% end %>
+      <!-- About -->
+      <% if @profile.about.present? %>
+        <section class="mt-6 prose max-w-none">
+          <%= simple_format(@profile.about) %>
+        </section>
+      <% end %>
 
-  <!-- Projects -->
-  <section class="mt-8">
-    <h2 class="text-xl font-semibold mb-3">Projects</h2>
-    <% if @projects.any? %>
-      <div class="grid gap-4 md:grid-cols-3">
-        <% @projects.each do |project| %>
-          <div class="rounded-xl overflow-hidden border bg-white">
-            <% if project.photos.attached? %>
-              <%= image_tag project.photos.first.variant(resize_to_fill: [600, 400]), class: 'w-full h-40 object-cover' %>
-            <% else %>
-              <div class="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">No photo</div>
+      <!-- Projects -->
+      <section class="mt-8">
+        <h2 class="text-xl font-semibold mb-3">Projects</h2>
+        <% if @projects.any? %>
+          <div class="grid gap-4 md:grid-cols-2">
+            <% @projects.each do |project| %>
+              <div class="rounded-xl overflow-hidden border bg-white">
+                <% if project.photos.attached? %>
+                  <%= image_tag project.photos.first.variant(resize_to_fill: [600, 400]), class: 'w-full h-40 object-cover' %>
+                <% else %>
+                  <div class="w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">No photo</div>
+                <% end %>
+                <div class="p-4">
+                  <h3 class="font-medium"><%= project.title %></h3>
+                  <p class="text-sm text-gray-600 line-clamp-3"><%= project.description %></p>
+                </div>
+              </div>
             <% end %>
-            <div class="p-4">
-              <h3 class="font-medium"><%= project.title %></h3>
-              <p class="text-sm text-gray-600 line-clamp-3"><%= project.description %></p>
-            </div>
+          </div>
+        <% else %>
+          <div class="rounded-xl border bg-white p-6 text-center text-gray-600">
+            No projects published yet.
           </div>
         <% end %>
-      </div>
-    <% else %>
-      <div class="rounded-xl border bg-white p-6 text-center text-gray-600">
-        No projects published yet.
-      </div>
-    <% end %>
-  </section>
+      </section>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="lg:col-span-1">
+      <!-- Compact Calendar -->
+      <%= render 'shared/compact_calendar',
+          profile: @profile,
+          current_month: @current_month,
+          calendar_data: @calendar_data %>
+    </div>
+  </div>
 
   <!-- Job Request Form -->
   <section class="mt-12">

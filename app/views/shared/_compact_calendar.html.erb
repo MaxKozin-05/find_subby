@@ -1,0 +1,75 @@
+<!-- app/views/shared/_compact_calendar.html.erb -->
+<div class="bg-white rounded-lg shadow p-4" data-controller="public-calendar">
+  <div class="flex items-center justify-between mb-3">
+    <h3 class="font-medium text-gray-900">Availability</h3>
+    <%= link_to "View full calendar", public_calendar_path(handle: profile.handle),
+        class: "text-sm text-blue-600 hover:text-blue-800" %>
+  </div>
+
+  <!-- Month header -->
+  <div class="text-center mb-3">
+    <h4 class="text-sm font-medium text-gray-700"><%= current_month.strftime("%B %Y") %></h4>
+  </div>
+
+  <!-- Mini calendar grid -->
+  <div class="grid grid-cols-7 gap-1 text-xs">
+    <!-- Day headers -->
+    <% %w[S M T W T F S].each do |day| %>
+      <div class="text-center text-gray-500 font-medium p-1"><%= day %></div>
+    <% end %>
+
+    <!-- Calendar days -->
+    <% calendar_start = current_month.beginning_of_week %>
+    <% calendar_end = current_month.end_of_month.end_of_week %>
+
+    <% (calendar_start..calendar_end).each do |date| %>
+      <%
+        is_current_month = date.month == current_month.month
+        is_today = date == Date.current
+        is_past = date < Date.current
+        calendar_entry = calendar_data[date]
+        state = calendar_entry&.dig(:state) || 'available'
+        source = calendar_entry&.dig(:source) || 'default'
+      %>
+
+      <div class="relative p-1 text-center">
+        <!-- Date number -->
+        <div class="<%= 'text-gray-300' unless is_current_month %>
+                    <%= 'font-bold text-blue-600' if is_today %>
+                    <%= 'text-gray-400' if is_past %>
+                    text-xs">
+          <%= date.day %>
+        </div>
+
+        <!-- Availability indicator -->
+        <% if is_current_month && !is_past %>
+          <div class="mx-auto mt-0.5 w-2 h-2 rounded-full
+                      <%= case state
+                          when 'available' then 'bg-green-400'
+                          when 'busy' then 'bg-red-400'
+                          when 'booked' then 'bg-blue-400'
+                          end %>">
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Legend -->
+  <div class="mt-3 pt-3 border-t border-gray-100">
+    <div class="flex items-center justify-center gap-3 text-xs">
+      <div class="flex items-center gap-1">
+        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+        <span class="text-gray-600">Available</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <div class="w-2 h-2 bg-red-400 rounded-full"></div>
+        <span class="text-gray-600">Busy</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <div class="w-2 h-2 bg-blue-400 rounded-full"></div>
+        <span class="text-gray-600">Booked</span>
+      </div>
+    </div>
+  </div>
+</div>

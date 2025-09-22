@@ -1,0 +1,151 @@
+<!-- app/views/public/calendars/show.html.erb -->
+<div class="max-w-6xl mx-auto p-6">
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold">
+        <%= @profile.business_name %> - Availability
+      </h1>
+      <p class="text-gray-600 mt-1">
+        Check availability for <%= @current_date.strftime("%B %Y") %>
+      </p>
+    </div>
+
+    <!-- Month Navigation -->
+    <div class="flex items-center gap-4">
+      <%= link_to public_calendar_path(@profile.handle, year: @current_date.prev_month.year, month: @current_date.prev_month.month),
+          class: "p-2 text-gray-600 hover:text-gray-900" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+      <% end %>
+
+      <h2 class="text-lg font-medium min-w-[200px] text-center">
+        <%= @current_date.strftime("%B %Y") %>
+      </h2>
+
+      <%= link_to public_calendar_path(@profile.handle, year: @current_date.next_month.year, month: @current_date.next_month.month),
+          class: "p-2 text-gray-600 hover:text-gray-900" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <h3 class="font-medium mb-3">Availability Legend</h3>
+    <div class="flex flex-wrap gap-4 text-sm">
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 bg-green-100 border border-green-200 rounded"></div>
+        <span>Available</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 bg-red-100 border border-red-200 rounded"></div>
+        <span>Busy</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-4 h-4 bg-blue-100 border border-blue-200 rounded"></div>
+        <span>Booked</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calendar Grid -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <!-- Day Headers -->
+    <div class="grid grid-cols-7 bg-gray-50 border-b">
+      <% %w[Sunday Monday Tuesday Wednesday Thursday Friday Saturday].each do |day| %>
+        <div class="p-3 text-center text-sm font-medium text-gray-700 border-r last:border-r-0">
+          <%= day %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Calendar Days -->
+    <div class="grid grid-cols-7">
+      <% calendar_start = @current_date.beginning_of_month.beginning_of_week %>
+      <% calendar_end = @current_date.end_of_month.end_of_week %>
+
+      <% (calendar_start..calendar_end).each do |date| %>
+        <%
+          is_current_month = date.month == @month
+          is_today = date == Date.current
+          is_past = date < Date.current
+          calendar_entry = @calendar_data[date]
+          state = calendar_entry&.dig(:state) || 'available'
+          notes = calendar_entry&.dig(:notes)
+        %>
+
+        <div class="min-h-[80px] p-2 border-r border-b last-in-row:border-r-0 last-row:border-b-0
+                    <%= 'bg-gray-50' unless is_current_month %>
+                    <%= 'bg-gray-100' if is_past && is_current_month %>
+                    <%= 'ring-2 ring-blue-500' if is_today %>">
+
+          <!-- Date Number -->
+          <div class="flex items-start justify-between mb-1">
+            <span class="text-sm font-medium
+                        <%= if is_current_month && !is_past
+                            'text-gray-900'
+                          elsif is_current_month && is_past
+                            'text-gray-500'
+                          else
+                            'text-gray-400'
+                          end %>
+                        <%= 'text-blue-600 font-bold' if is_today %>">
+              <%= date.day %>
+            </span>
+
+            <% if is_current_month && !is_past %>
+              <!-- State Indicator -->
+              <div class="w-3 h-3 rounded-full
+                          <%= case state
+                              when 'available' then 'bg-green-400'
+                              when 'busy' then 'bg-red-400'
+                              when 'booked' then 'bg-blue-400'
+                              end %>">
+              </div>
+            <% end %>
+          </div>
+
+          <% if is_current_month && !is_past %>
+            <!-- State Badge -->
+            <div class="text-xs px-2 py-1 rounded-full text-center
+                        <%= case state
+                            when 'available' then 'bg-green-100 text-green-800'
+                            when 'busy' then 'bg-red-100 text-red-800'
+                            when 'booked' then 'bg-blue-100 text-blue-800'
+                            end %>">
+              <%= state.humanize %>
+            </div>
+          <% elsif is_past && is_current_month %>
+            <!-- Past date indicator -->
+            <div class="text-xs px-2 py-1 rounded-full text-center bg-gray-100 text-gray-500">
+              Past
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Call to Action -->
+  <div class="mt-8 bg-blue-50 rounded-lg p-6 text-center">
+    <h3 class="text-lg font-semibold text-blue-900 mb-2">
+      Need to book <%= @profile.business_name %>?
+    </h3>
+    <p class="text-blue-700 mb-4">
+      Request a quote for available dates and we'll get back to you promptly.
+    </p>
+    <%= link_to "Request Quote", public_profile_path(@profile.handle),
+        class: "inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors" %>
+  </div>
+
+  <!-- Back to Profile -->
+  <div class="mt-4 text-center">
+    <%= link_to "← Back to #{@profile.business_name}'s Profile",
+        public_profile_path(@profile.handle),
+        class: "text-blue-600 hover:text-blue-700" %>
+  </div>
+</div>
