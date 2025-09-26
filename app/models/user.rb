@@ -1,4 +1,4 @@
-# app/models/user.rb (updated)
+
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
@@ -11,6 +11,7 @@ class User < ApplicationRecord
   has_many :jobs, dependent: :destroy
   has_many :notifications, dependent: :destroy
   has_many :calendar_days, dependent: :destroy
+  has_many :quotes, dependent: :destroy  # ADD THIS LINE
 
   def unread_notifications_count
     notifications.unread.count

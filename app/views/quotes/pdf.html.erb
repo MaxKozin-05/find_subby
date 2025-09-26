@@ -1,0 +1,390 @@
+<!-- app/views/quotes/pdf.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Quote - <%= @quote.title %></title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 40px;
+      border-bottom: 2px solid #2563eb;
+      padding-bottom: 20px;
+    }
+
+    .company-info {
+      flex: 1;
+    }
+
+    .company-name {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2563eb;
+      margin-bottom: 5px;
+    }
+
+    .company-details {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .quote-info {
+      text-align: right;
+      flex: 1;
+    }
+
+    .quote-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #1f2937;
+      margin-bottom: 10px;
+    }
+
+    .quote-meta {
+      color: #666;
+      margin-bottom: 5px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .status-draft { background-color: #f3f4f6; color: #374151; }
+    .status-sent { background-color: #dbeafe; color: #1e40af; }
+    .status-accepted { background-color: #dcfce7; color: #166534; }
+    .status-expired { background-color: #fef2f2; color: #991b1b; }
+
+    .client-info {
+      margin: 40px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .info-section {
+      flex: 1;
+      margin-right: 40px;
+    }
+
+    .info-section:last-child {
+      margin-right: 0;
+    }
+
+    .info-section h3 {
+      font-size: 14px;
+      font-weight: bold;
+      color: #374151;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-section p {
+      margin: 2px 0;
+      color: #4b5563;
+    }
+
+    .section-header {
+      background-color: #f8fafc;
+      padding: 12px 20px;
+      border-left: 4px solid #2563eb;
+      margin: 30px 0 0 0;
+      font-size: 18px;
+      font-weight: bold;
+      color: #1e40af;
+    }
+
+    .labour-header {
+      border-left-color: #2563eb;
+      color: #1e40af;
+    }
+
+    .materials-header {
+      border-left-color: #059669;
+      color: #047857;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    table th {
+      background-color: #f9fafb;
+      padding: 12px 15px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: bold;
+      color: #374151;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    table th:last-child {
+      text-align: right;
+    }
+
+    table td {
+      padding: 10px 15px;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 13px;
+    }
+
+    table td:last-child {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .subtotal-row {
+      background-color: #f8fafc;
+      font-weight: bold;
+    }
+
+    .totals-section {
+      margin-top: 40px;
+      float: right;
+      width: 350px;
+    }
+
+    .totals-table {
+      margin-bottom: 0;
+    }
+
+    .totals-table td {
+      padding: 8px 15px;
+      border: none;
+      font-size: 14px;
+    }
+
+    .total-row {
+      background-color: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .total-row td {
+      padding: 12px 15px;
+    }
+
+    .footer {
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      font-size: 12px;
+      color: #6b7280;
+      clear: both;
+    }
+
+    .terms {
+      margin-top: 30px;
+    }
+
+    .terms h3 {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #374151;
+    }
+
+    .terms p {
+      font-size: 12px;
+      line-height: 1.5;
+      color: #4b5563;
+      margin-bottom: 8px;
+    }
+
+    @media print {
+      body { margin: 0; padding: 15px; }
+      .header { page-break-inside: avoid; }
+      .section-header { page-break-after: avoid; }
+      table { page-break-inside: avoid; }
+      .totals-section { page-break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header Section -->
+  <div class="header">
+    <div class="company-info">
+      <% if @profile&.logo&.attached? %>
+        <img src="<%= url_for(@profile.logo) %>" alt="<%= @profile.business_name %>" style="max-height: 60px; margin-bottom: 10px;">
+      <% end %>
+
+      <div class="company-name"><%= @profile&.business_name || 'Your Business Name' %></div>
+      <div class="company-details">
+        <% if @profile&.trade_type.present? %>
+          <%= @profile.trade_type %><br>
+        <% end %>
+        <% if @profile&.user&.email.present? %>
+          Email: <%= @profile.user.email %><br>
+        <% end %>
+        <% if @profile&.service_areas&.any? %>
+          Service Areas: <%= @profile.service_areas.join(', ') %><br>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="quote-info">
+      <div class="quote-title">QUOTE</div>
+      <div class="quote-meta">Quote #: <%= @quote.id %></div>
+      <div class="quote-meta">Version: <%= @quote.version %></div>
+      <div class="quote-meta">Date: <%= @quote.created_at.strftime("%B %d, %Y") %></div>
+      <div style="margin-top: 10px;">
+        <span class="status-badge status-<%= @quote.status %>">
+          <%= @quote.status.humanize %>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client Information -->
+  <div class="client-info">
+    <div class="info-section">
+      <h3>Quote For:</h3>
+      <p><strong><%= @quote.title %></strong></p>
+      <% if @quote.job %>
+        <p>Related Job: <%= @quote.job.title %></p>
+        <% if @quote.job.client_name.present? %>
+          <p><%= @quote.job.client_name %></p>
+          <% if @quote.job.client_email.present? %>
+            <p><%= @quote.job.client_email %></p>
+          <% end %>
+          <% if @quote.job.client_phone.present? %>
+            <p><%= @quote.job.client_phone %></p>
+          <% end %>
+          <% if @quote.job.location.present? %>
+            <p><%= @quote.job.location %></p>
+          <% end %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="info-section">
+      <h3>Quote Details:</h3>
+      <p>Pricing Model: <%= @quote.pricing_model.humanize %></p>
+      <% if @quote.description.present? %>
+        <p><%= simple_format(@quote.description) %></p>
+      <% end %>
+      <% if @quote.gst_enabled? %>
+        <p>GST Rate: <%= number_to_percentage(@quote.gst_rate * 100, precision: 1) %></p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Labour Section -->
+  <% labour_items = @quote.quote_items.labour %>
+  <% if labour_items.any? %>
+    <div class="section-header labour-header">Labour</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Unit</th>
+          <th>Unit Price</th>
+          <th>Line Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% labour_items.each do |item| %>
+          <tr>
+            <td><%= item.description %></td>
+            <td><%= number_with_precision(item.quantity, precision: 2, strip_insignificant_zeros: true) %></td>
+            <td><%= item.unit %></td>
+            <td><%= number_to_currency(item.unit_price) %></td>
+            <td><%= number_to_currency(item.line_total) %></td>
+          </tr>
+        <% end %>
+        <tr class="subtotal-row">
+          <td colspan="4"><strong>Labour Subtotal</strong></td>
+          <td><strong><%= number_to_currency(labour_items.sum(&:line_total)) %></strong></td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
+
+  <!-- Materials Section -->
+  <% materials_items = @quote.quote_items.materials %>
+  <% if materials_items.any? %>
+    <div class="section-header materials-header">Materials</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Unit</th>
+          <th>Unit Price</th>
+          <th>Line Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% materials_items.each do |item| %>
+          <tr>
+            <td><%= item.description %></td>
+            <td><%= number_with_precision(item.quantity, precision: 2, strip_insignificant_zeros: true) %></td>
+            <td><%= item.unit %></td>
+            <td><%= number_to_currency(item.unit_price) %></td>
+            <td><%= number_to_currency(item.line_total) %></td>
+          </tr>
+        <% end %>
+        <tr class="subtotal-row">
+          <td colspan="4"><strong>Materials Subtotal</strong></td>
+          <td><strong><%= number_to_currency(materials_items.sum(&:line_total)) %></strong></td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
+
+  <!-- Totals Section -->
+  <div class="totals-section">
+    <table class="totals-table">
+      <tr>
+        <td><strong>Subtotal:</strong></td>
+        <td><strong><%= number_to_currency(@quote.subtotal) %></strong></td>
+      </tr>
+      <% if @quote.gst_enabled? %>
+        <tr>
+          <td>GST (<%= number_to_percentage(@quote.gst_rate * 100, precision: 1) %>):</td>
+          <td><%= number_to_currency(@quote.gst_amount) %></td>
+        </tr>
+      <% end %>
+      <tr class="total-row">
+        <td><strong>TOTAL:</strong></td>
+        <td><strong><%= number_to_currency(@quote.total) %></strong></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Terms and Conditions -->
+  <div class="terms">
+    <h3>Terms & Conditions</h3>
+    <p>• This quote is valid for 30 days from the date of issue.</p>
+    <p>• Payment terms: 50% deposit required, balance due upon completion.</p>
+    <p>• All materials are subject to availability and current market pricing.</p>
+    <p>• Any variations to this quote must be agreed in writing.</p>
+    <p>• Work will commence upon receipt of signed acceptance and deposit.</p>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Thank you for considering our services. We look forward to working with you!</p>
+    <p>Generated on <%= Time.current.strftime("%B %d, %Y at %I:%M %p") %></p>
+  </div>
+</body>
+</html>

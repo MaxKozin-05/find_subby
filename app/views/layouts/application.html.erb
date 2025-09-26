@@ -52,6 +52,10 @@
               Calendar
             <% end %>
 
+             <%= link_to quotes_path, class: 'text-sm hover:text-blue-600 transition-colors' do %>
+              Quotes
+            <% end %>
+
             <%= link_to destroy_user_session_path, data: { turbo_method: :delete },
                 class: 'text-sm text-red-600 hover:text-red-700 transition-colors' do %>
               Log out

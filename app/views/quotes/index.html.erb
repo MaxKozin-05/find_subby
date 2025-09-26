@@ -1,0 +1,158 @@
+<!-- app/views/quotes/index.html.erb -->
+<div class="max-w-6xl mx-auto p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-semibold">Quotes</h1>
+
+    <div class="flex items-center gap-3">
+      <!-- Status Filter Tabs -->
+      <div class="flex gap-1 mr-4">
+        <%= link_to "All", quotes_path,
+            class: "px-3 py-2 rounded text-sm #{params[:status].blank? ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
+        <%= link_to "Draft", quotes_path(status: :draft),
+            class: "px-3 py-2 rounded text-sm #{params[:status] == 'draft' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
+        <%= link_to "Sent", quotes_path(status: :sent),
+            class: "px-3 py-2 rounded text-sm #{params[:status] == 'sent' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
+        <%= link_to "Accepted", quotes_path(status: :accepted),
+            class: "px-3 py-2 rounded text-sm #{params[:status] == 'accepted' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
+      </div>
+
+      <%= link_to "New Quote", new_quote_path,
+          class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium" %>
+    </div>
+  </div>
+
+  <% if @quotes.any? %>
+    <!-- Quotes Table -->
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Quote
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Version
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Total
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Created
+            </th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @quotes.each do |quote| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <div>
+                  <div class="text-sm font-medium text-gray-900">
+                    <%= link_to quote.title, quote, class: "hover:text-blue-600" %>
+                  </div>
+                  <% if quote.job %>
+                    <div class="text-sm text-gray-500">
+                      Job: <%= quote.job.title %>
+                    </div>
+                  <% end %>
+                  <% if quote.description.present? %>
+                    <div class="text-sm text-gray-500">
+                      <%= truncate(quote.description, length: 60) %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">
+                  v<%= quote.version %>
+                  <% if quote.child_quotes.any? %>
+                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      <%= pluralize(quote.child_quotes.count, 'update') %>
+                    </span>
+                  <% end %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  <%= case quote.status
+                      when 'draft' then 'bg-gray-100 text-gray-800'
+                      when 'sent' then 'bg-blue-100 text-blue-800'
+                      when 'accepted' then 'bg-green-100 text-green-800'
+                      when 'expired' then 'bg-red-100 text-red-800'
+                      end %>">
+                  <%= quote.status.humanize %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900">
+                  <%= number_to_currency(quote.total) %>
+                </div>
+                <% if quote.gst_enabled? %>
+                  <div class="text-xs text-gray-500">
+                    (incl. GST <%= number_to_percentage(quote.gst_rate * 100, precision: 1) %>)
+                  </div>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= quote.created_at.strftime("%b %d, %Y") %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                <%= link_to "View", quote, class: "text-blue-600 hover:text-blue-900" %>
+
+                <% if quote.pdf_file.attached? %>
+                  <%= link_to pdf_quote_path(quote), target: "_blank",
+                      class: "text-green-600 hover:text-green-900" do %>
+                    PDF
+                  <% end %>
+                <% end %>
+
+                <%= link_to "Edit", edit_quote_path(quote), class: "text-yellow-600 hover:text-yellow-900" %>
+
+                <%= link_to duplicate_quote_path(quote), method: :post,
+                    class: "text-purple-600 hover:text-purple-900",
+                    title: "Create new version" do %>
+                  Duplicate
+                <% end %>
+
+                <%= link_to quote, method: :delete,
+                    class: "text-red-600 hover:text-red-900",
+                    data: {
+                      turbo_method: :delete,
+                      turbo_confirm: "Are you sure you want to delete this quote?"
+                    } do %>
+                  Delete
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <!-- Empty State -->
+    <div class="text-center py-12 bg-white rounded-lg shadow">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No quotes yet</h3>
+      <p class="mt-1 text-sm text-gray-500">
+        <% if params[:status].present? %>
+          No quotes with <%= params[:status].humanize.downcase %> status found.
+        <% else %>
+          Get started by creating your first quote.
+        <% end %>
+      </p>
+      <div class="mt-6">
+        <%= link_to new_quote_path,
+            class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700" do %>
+          Create Quote
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
