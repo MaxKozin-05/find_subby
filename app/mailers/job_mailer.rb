@@ -17,17 +17,19 @@ class JobMailer < ApplicationMailer
     @profile = @job.user.profile
 
     subject_text = case @job.status
-    when 'contacted'
-      "We've received your request"
-    when 'quoted'
-      "Quote ready for your project"
-    when 'accepted'
-      "Your project has been accepted"
-    when 'declined'
-      "Update on your project request"
-    else
-      "Update on your job request"
-    end
+                   when 'quoted'
+                     "Quote ready for your project"
+                   when 'won'
+                     "Your project is locked in"
+                   when 'in_progress'
+                     "We're underway on your project"
+                   when 'completed'
+                     "Your project is complete"
+                   when 'lost'
+                     "Update on your project request"
+                   else
+                     "Update on your job request"
+                   end
 
     mail(
       to: @job.client_email,

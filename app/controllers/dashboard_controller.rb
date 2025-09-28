@@ -13,5 +13,6 @@ class DashboardController < ApplicationController
 
     @recent_jobs = current_user.jobs.order(created_at: :desc).limit(5)
     @recent_quotes = current_user.quotes.order(created_at: :desc).limit(3)  # ADD THIS
+    @in_progress_jobs = current_user.jobs.in_flight.order(starts_on: :asc).limit(5)
   end
 end

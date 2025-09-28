@@ -166,9 +166,8 @@
           <div class="border-l-4
             <%= case job.status
                 when 'lead' then 'border-yellow-500'
-                when 'contacted' then 'border-blue-500'
                 when 'quoted' then 'border-purple-500'
-                when 'accepted' then 'border-green-500'
+                when 'won' then 'border-green-500'
                 else 'border-gray-500'
                 end %> pl-4">
             <div class="flex items-start justify-between">
@@ -183,9 +182,11 @@
               <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full
                 <%= case job.status
                     when 'lead' then 'bg-yellow-100 text-yellow-800'
-                    when 'contacted' then 'bg-blue-100 text-blue-800'
                     when 'quoted' then 'bg-purple-100 text-purple-800'
-                    when 'accepted' then 'bg-green-100 text-green-800'
+                    when 'won' then 'bg-green-100 text-green-800'
+                    when 'in_progress' then 'bg-indigo-100 text-indigo-800'
+                    when 'completed' then 'bg-emerald-100 text-emerald-800'
+                    when 'lost' then 'bg-red-100 text-red-800'
                     else 'bg-gray-100 text-gray-800'
                     end %>">
                 <%= job.status.humanize %>
@@ -198,6 +199,37 @@
       <p class="text-gray-500">No job requests yet.</p>
     <% end %>
   </div>
+
+  <% if @in_progress_jobs.any? %>
+    <div class="mt-8 bg-white rounded-xl border p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-medium">Jobs In Progress</h2>
+        <%= link_to "Manage", jobs_path(status: [:quoted, :won, :in_progress]), class: "text-blue-600 hover:text-blue-700" %>
+      </div>
+
+      <div class="space-y-3">
+        <% @in_progress_jobs.each do |job| %>
+          <div class="flex items-start justify-between border-b last:border-b-0 pb-3">
+            <div>
+              <h3 class="font-medium">
+                <%= link_to job.title, job, class: "hover:text-blue-600" %>
+              </h3>
+              <p class="text-sm text-gray-600">
+                <%= job.client_name %>
+                <% if job.starts_on.present? && job.ends_on.present? %>
+                  • <%= job.starts_on.strftime('%b %d') %> – <%= job.ends_on.strftime('%b %d') %>
+                <% end %>
+              </p>
+            </div>
+            <span class="inline-flex items-center px-2 py-1 text-xs font-semibold rounded-full
+              <%= job.in_progress? ? 'bg-indigo-100 text-indigo-800' : 'bg-green-100 text-green-800' %>">
+              <%= job.status.humanize %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 
   <!-- Quick Actions -->
   <div class="mt-6">

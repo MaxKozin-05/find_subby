@@ -24,9 +24,12 @@ class JobsController < ApplicationController
   end
 
   def update
+    block_calendar = ActiveModel::Type::Boolean.new.cast(params.dig(:job, :block_calendar))
+
     if @job.update(job_params)
-      # Send notification to client if status changed to something meaningful
-      if @job.saved_change_to_status? && %w[contacted quoted accepted declined].include?(@job.status)
+      handle_calendar_blocking(block_calendar)
+
+      if @job.saved_change_to_status? && %w[quoted won in_progress completed lost].include?(@job.status)
         JobMailer.job_status_update(@job).deliver_later
       end
 
@@ -45,6 +48,25 @@ class JobsController < ApplicationController
   end
 
   def job_params
-    params.require(:job).permit(:status, :estimated_budget, :preferred_start_date)
+    params.require(:job).permit(:status, :estimated_budget, :preferred_start_date, :starts_on, :ends_on)
+  end
+
+  def handle_calendar_blocking(block_calendar)
+    block_calendar &&= @job.won? || @job.in_progress?
+
+    blocker = Jobs::CalendarBlocker.new(@job)
+
+    if block_calendar
+      if @job.starts_on.present? && @job.ends_on.present?
+        blocker.apply!
+      else
+        flash[:alert] = 'Add both start and finish dates to block your calendar.' if respond_to?(:flash)
+      end
+    elsif @job.calendar_blocked?
+      blocker.clear!
+    end
+  rescue ActiveRecord::RecordInvalid => error
+    Rails.logger.error("Calendar blocking failed for Job ##{@job.id}: #{error.message}")
+    flash[:alert] = "Job saved, but we couldn't update the calendar: #{error.record.errors.full_messages.to_sentence}" if respond_to?(:flash)
   end
 end

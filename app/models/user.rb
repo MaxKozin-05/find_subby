@@ -9,6 +9,7 @@ class User < ApplicationRecord
 
   has_one :profile, dependent: :destroy
   has_many :jobs, dependent: :destroy
+  has_many :job_blocks, dependent: :destroy
   has_many :notifications, dependent: :destroy
   has_many :calendar_days, dependent: :destroy
   has_many :quotes, dependent: :destroy  # ADD THIS LINE
