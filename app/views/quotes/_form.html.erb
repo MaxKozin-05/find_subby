@@ -78,8 +78,8 @@
       <div class="flex items-start space-x-6">
         <div class="flex items-center">
           <%= form.check_box :gst_enabled,
-              { data: { action: "change->quote-form#toggleGST" } },
-              { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" } %>
+              class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded",
+              data: { action: "change->quote-form#toggleGST" } %>
           <%= form.label :gst_enabled, "Include GST", class: "ml-2 block text-sm text-gray-900" %>
         </div>
 

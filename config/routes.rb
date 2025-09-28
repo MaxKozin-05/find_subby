@@ -26,7 +26,7 @@ Rails.application.routes.draw do
       member do
         get :pdf
         post :duplicate
-        patch :generate_pdf
+        match :generate_pdf, via: [:patch, :get]
       end
 
       # Nested route for quote items (if you need separate CRUD)

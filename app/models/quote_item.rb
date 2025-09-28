@@ -21,7 +21,7 @@ class QuoteItem < ApplicationRecord
   private
 
   def set_position
-    if position.zero?
+    if position.blank? || position.zero?
       max_position = quote.quote_items.where(category: category).maximum(:position) || 0
       self.position = max_position + 1
     end
