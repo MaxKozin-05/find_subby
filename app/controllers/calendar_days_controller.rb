@@ -54,6 +54,9 @@ class CalendarDaysController < ApplicationController
 
   def toggle
     date = Date.parse(params[:date])
+    @calendar_day = current_user.calendar_days.find_or_initialize_by(day: date)
+    authorize @calendar_day, :toggle?
+
     @calendar_day = CalendarDay.toggle_state(current_user, date)
 
     render json: {
@@ -68,6 +71,8 @@ class CalendarDaysController < ApplicationController
   def bulk_update
     dates = params[:dates] || []
     state = params[:state]
+
+    authorize CalendarDay, :bulk_update?
 
     unless CalendarDay.states.keys.include?(state)
       return render json: { error: 'Invalid state' }, status: :bad_request

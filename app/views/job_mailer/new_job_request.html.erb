@@ -141,14 +141,16 @@ Dashboard: <%= dashboard_url %>
         <p><strong>Status Update:</strong> <%= @job.status.humanize %></p>
 
         <% case @job.status %>
-        <% when 'contacted' %>
-          <p>We've received your job request and will be in touch shortly to discuss the details and schedule a consultation.</p>
         <% when 'quoted' %>
           <p>We've prepared a quote for your project. Please check your email for the detailed quote or contact us directly.</p>
-        <% when 'accepted' %>
-          <p>Great news! We've accepted your project and are excited to work with you. We'll be in touch soon to schedule the work.</p>
-        <% when 'declined' %>
-          <p>Thank you for considering us for your project. Unfortunately, we're unable to take on this job at this time. We appreciate your interest and wish you the best with your project.</p>
+        <% when 'won' %>
+          <p>Great news! We've locked in your project and will confirm the schedule with you shortly.</p>
+        <% when 'in_progress' %>
+          <p>We're currently on-site working on your project. Reach out anytime if you have questions.</p>
+        <% when 'completed' %>
+          <p>Your project is complete! Thank you for working with us. Let us know if there's anything else you need.</p>
+        <% when 'lost' %>
+          <p>Thank you for considering us for your project. If circumstances change, we're here to help.</p>
         <% else %>
           <p>Your job request has been updated. We'll keep you informed of any changes to the status.</p>
         <% end %>
@@ -180,14 +182,16 @@ Your job request "<%= @job.title %>" has been updated.
 Status: <%= @job.status.humanize %>
 
 <% case @job.status %>
-<% when 'contacted' %>
-We've received your job request and will be in touch shortly to discuss the details and schedule a consultation.
 <% when 'quoted' %>
 We've prepared a quote for your project. Please check your email for the detailed quote or contact us directly.
-<% when 'accepted' %>
-Great news! We've accepted your project and are excited to work with you. We'll be in touch soon to schedule the work.
-<% when 'declined' %>
-Thank you for considering us for your project. Unfortunately, we're unable to take on this job at this time. We appreciate your interest and wish you the best with your project.
+<% when 'won' %>
+Great news! We've locked in your project and will confirm the schedule with you shortly.
+<% when 'in_progress' %>
+We're currently on-site working on your project. Reach out anytime if you have questions.
+<% when 'completed' %>
+Your project is complete! Thank you for working with us. Let us know if there's anything else you need.
+<% when 'lost' %>
+Thank you for considering us for your project. If circumstances change, we're here to help.
 <% else %>
 Your job request has been updated. We'll keep you informed of any changes to the status.
 <% end %>

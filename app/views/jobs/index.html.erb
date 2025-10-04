@@ -9,10 +9,12 @@
           class: "px-3 py-2 rounded text-sm #{params[:status].blank? ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
       <%= link_to "New Leads", jobs_path(status: :lead),
           class: "px-3 py-2 rounded text-sm #{params[:status] == 'lead' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
-      <%= link_to "In Progress", jobs_path(status: [:contacted, :quoted, :accepted, :in_progress]),
-          class: "px-3 py-2 rounded text-sm #{%w[contacted quoted accepted in_progress].include?(params[:status]) ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
+      <%= link_to "In Flight", jobs_path(status: [:quoted, :won, :in_progress]),
+          class: "px-3 py-2 rounded text-sm #{Array(params[:status]).map(&:to_s).sort == %w[in_progress quoted won] ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
       <%= link_to "Completed", jobs_path(status: :completed),
           class: "px-3 py-2 rounded text-sm #{params[:status] == 'completed' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
+      <%= link_to "Lost", jobs_path(status: :lost),
+          class: "px-3 py-2 rounded text-sm #{params[:status] == 'lost' ? 'bg-blue-600 text-white' : 'border hover:bg-gray-50'}" %>
     </div>
   </div>
 
@@ -30,13 +32,11 @@
                   <span class="ml-4 inline-block px-3 py-1 text-sm font-medium rounded-full
                     <%= case job.status
                         when 'lead' then 'bg-yellow-100 text-yellow-800'
-                        when 'contacted' then 'bg-blue-100 text-blue-800'
                         when 'quoted' then 'bg-purple-100 text-purple-800'
-                        when 'accepted' then 'bg-green-100 text-green-800'
+                        when 'won' then 'bg-green-100 text-green-800'
                         when 'in_progress' then 'bg-indigo-100 text-indigo-800'
                         when 'completed' then 'bg-emerald-100 text-emerald-800'
-                        when 'declined' then 'bg-red-100 text-red-800'
-                        when 'cancelled' then 'bg-gray-100 text-gray-800'
+                        when 'lost' then 'bg-red-100 text-red-800'
                         else 'bg-gray-100 text-gray-800'
                         end %>">
                     <%= job.status.humanize %>
@@ -97,6 +97,9 @@
                   <div class="flex items-center gap-4">
                     <% if job.preferred_start_date.present? %>
                       <span>Start: <%= job.preferred_start_date.strftime("%b %d") %></span>
+                    <% end %>
+                    <% if job.starts_on.present? && job.ends_on.present? %>
+                      <span>Booked: <%= job.starts_on.strftime('%b %d') %> – <%= job.ends_on.strftime('%b %d') %></span>
                     <% end %>
                     <span>Submitted <%= time_ago_in_words(job.created_at) %> ago</span>
                   </div>

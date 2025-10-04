@@ -4,11 +4,14 @@
 
 import { application } from "./application"
 
-import HelloController from "./hello_controller"
-application.register("hello", HelloController)
-
 import CalendarController from "./calendar_controller"
 application.register("calendar", CalendarController)
 
+import HelloController from "./hello_controller"
+application.register("hello", HelloController)
+
 import PublicCalendarController from "./public_calendar_controller"
 application.register("public-calendar", PublicCalendarController)
+
+import QuoteFormController from "./quote_form_controller"
+application.register("quote-form", QuoteFormController)

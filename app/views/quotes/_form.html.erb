@@ -1,0 +1,198 @@
+<!-- app/views/quotes/_form.html.erb -->
+<div class="max-w-5xl mx-auto p-6"
+     data-controller="quote-form"
+     data-quote-form-gst-rate-value="<%= @quote.gst_rate %>">
+
+  <%= form_with model: @quote, local: true, html: { class: "space-y-8" } do |form| %>
+    <% if @quote.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+        <h3 class="text-sm font-medium text-red-800">
+          <%= pluralize(@quote.errors.count, "error") %> prohibited this quote from being saved:
+        </h3>
+        <ul class="mt-2 text-sm text-red-700 list-disc pl-5">
+          <% @quote.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Quote Details Section -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">Quote Details</h2>
+
+      <div class="grid gap-6 md:grid-cols-2">
+        <div>
+          <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :title,
+              class: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+              placeholder: "e.g., Kitchen Renovation Quote" %>
+        </div>
+
+        <div>
+          <%= form.label :job_id, "Related Job (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :job_id,
+              options_from_collection_for_select(current_user.jobs.order(:created_at), :id, :title, @quote.job_id),
+              { include_blank: "Select a job (optional)" },
+              { class: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" } %>
+        </div>
+
+        <div>
+          <%= form.label :pricing_model, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :pricing_model,
+              options_for_select([
+                ['Fixed Price', 'fixed_price'],
+                ['Hourly Rate', 'hourly_rate'],
+                ['Cost Plus', 'cost_plus']
+              ], @quote.pricing_model),
+              {},
+              { class: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" } %>
+        </div>
+
+        <div>
+          <%= form.label :status, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.select :status,
+              options_for_select([
+                ['Draft', 'draft'],
+                ['Sent', 'sent'],
+                ['Accepted', 'accepted'],
+                ['Expired', 'expired']
+              ], @quote.status),
+              {},
+              { class: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white" } %>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= form.text_area :description, rows: 3,
+            class: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+            placeholder: "Additional notes or description for this quote..." %>
+      </div>
+    </div>
+
+    <!-- GST Settings -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">GST Settings</h2>
+
+      <div class="flex items-start space-x-6">
+        <div class="flex items-center">
+          <%= form.check_box :gst_enabled,
+              class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded",
+              data: { action: "change->quote-form#toggleGST" } %>
+          <%= form.label :gst_enabled, "Include GST", class: "ml-2 block text-sm text-gray-900" %>
+        </div>
+
+        <div class="flex-1 max-w-xs">
+          <%= form.label :gst_rate, "GST Rate (%)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.number_field :gst_rate, step: 0.01, min: 0, max: 1,
+              data: {
+                quote_form_target: "gstRate",
+                action: "input->quote-form#updateTotals"
+              },
+              class: "w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" %>
+          <p class="text-xs text-gray-500 mt-1">Enter as decimal (e.g., 0.10 for 10%)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Line Items Sections -->
+    <div class="space-y-6">
+      <!-- Labour Items -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Labour</h2>
+            <button type="button"
+                    data-action="click->quote-form#addLabourItem"
+                    class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
+              Add Labour Item
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div data-quote-form-target="labourItems">
+            <%= form.fields_for :quote_items do |item_form| %>
+              <% if item_form.object.labour? || (item_form.object.new_record? && item_form.object.category.blank?) %>
+                <%= render 'quote_item_fields', form: item_form, category: 'labour' %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <!-- Template for new labour items -->
+          <template data-quote-form-target="labourItemTemplate">
+            <%= form.fields_for :quote_items, QuoteItem.new(category: :labour), child_index: 'NEW_RECORD' do |item_form| %>
+              <%= render 'quote_item_fields', form: item_form, category: 'labour' %>
+            <% end %>
+          </template>
+        </div>
+      </div>
+
+      <!-- Materials Items -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-gray-900">Materials</h2>
+            <button type="button"
+                    data-action="click->quote-form#addMaterialsItem"
+                    class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200">
+              Add Materials Item
+            </button>
+          </div>
+        </div>
+
+        <div class="p-6">
+          <div data-quote-form-target="materialsItems">
+            <%= form.fields_for :quote_items do |item_form| %>
+              <% if item_form.object.materials? %>
+                <%= render 'quote_item_fields', form: item_form, category: 'materials' %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <!-- Template for new materials items -->
+          <template data-quote-form-target="materialsItemTemplate">
+            <%= form.fields_for :quote_items, QuoteItem.new(category: :materials), child_index: 'NEW_RECORD' do |item_form| %>
+              <%= render 'quote_item_fields', form: item_form, category: 'materials' %>
+            <% end %>
+          </template>
+        </div>
+      </div>
+    </div>
+
+    <!-- Totals Section -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">Quote Summary</h2>
+
+      <div class="space-y-3 max-w-sm ml-auto">
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">Subtotal:</span>
+          <span data-quote-form-target="subtotal" class="font-medium">$0.00</span>
+        </div>
+
+        <div class="flex justify-between text-sm" data-quote-form-target="gstRow" style="<%= 'display: none;' unless @quote.gst_enabled? %>">
+          <span class="text-gray-600">GST:</span>
+          <span data-quote-form-target="gstAmount" class="font-medium">$0.00</span>
+        </div>
+
+        <div class="flex justify-between text-lg font-semibold border-t pt-3">
+          <span>Total:</span>
+          <span data-quote-form-target="total">$0.00</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Buttons -->
+    <div class="flex justify-end space-x-3">
+      <%= link_to "Cancel", quotes_path,
+          class: "px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" %>
+
+      <%= form.submit "Save Draft",
+          class: "px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-medium" %>
+
+      <%= form.submit "Generate PDF",
+          class: "px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium" %>
+    </div>
+  <% end %>
+</div>

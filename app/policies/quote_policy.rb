@@ -1,5 +1,5 @@
-# app/policies/job_policy.rb
-class JobPolicy < ApplicationPolicy
+# app/policies/quote_policy.rb
+class QuotePolicy < ApplicationPolicy
   def index?
     user.present?
   end
@@ -8,7 +8,27 @@ class JobPolicy < ApplicationPolicy
     admin_or_owner?
   end
 
+  def create?
+    user.present?
+  end
+
   def update?
+    admin_or_owner?
+  end
+
+  def destroy?
+    admin_or_owner?
+  end
+
+  def duplicate?
+    admin_or_owner?
+  end
+
+  def generate_pdf?
+    admin_or_owner?
+  end
+
+  def pdf?
     admin_or_owner?
   end
 

@@ -65,6 +65,7 @@ GEM
       activerecord (= 7.1.5.2)
       activesupport (= 7.1.5.2)
       marcel (~> 1.0)
+    activestorage-cloudinary-service (0.2.3)
     activesupport (7.1.5.2)
       base64
       benchmark (>= 0.3)
@@ -102,6 +103,11 @@ GEM
       xpath (~> 3.2)
     childprocess (5.1.0)
       logger (~> 1.5)
+    cloudinary (2.4.0)
+      faraday (>= 2.0.1, < 3.0.0)
+      faraday-follow_redirects (~> 0.3.0)
+      faraday-multipart (~> 1.0, >= 1.0.4)
+      ostruct
     concurrent-ruby (1.3.5)
     connection_pool (2.5.3)
     crass (1.0.6)
@@ -124,10 +130,31 @@ GEM
     drb (2.2.3)
     erb (5.0.2)
     erubi (1.13.1)
+    faraday (2.13.4)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
+    faraday-multipart (1.1.1)
+      multipart-post (~> 2.0)
+    faraday-net_http (3.4.1)
+      net-http (>= 0.5.0)
+    ffi (1.17.2-aarch64-linux-gnu)
+    ffi (1.17.2-aarch64-linux-musl)
+    ffi (1.17.2-arm-linux-gnu)
+    ffi (1.17.2-arm-linux-musl)
+    ffi (1.17.2-arm64-darwin)
+    ffi (1.17.2-x86_64-darwin)
+    ffi (1.17.2-x86_64-linux-gnu)
+    ffi (1.17.2-x86_64-linux-musl)
     globalid (1.2.1)
       activesupport (>= 6.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    image_processing (1.14.0)
+      mini_magick (>= 4.9.5, < 6)
+      ruby-vips (>= 2.0.17, < 3)
     io-console (0.8.1)
     irb (1.15.2)
       pp (>= 0.6.0)
@@ -138,6 +165,7 @@ GEM
       activesupport (>= 7.0.0)
     jsbundling-rails (1.3.1)
       railties (>= 6.0.0)
+    json (2.15.0)
     launchy (3.1.1)
       addressable (~> 2.8)
       childprocess (~> 5.0)
@@ -160,10 +188,15 @@ GEM
       net-smtp
     marcel (1.0.4)
     matrix (0.4.3)
+    mini_magick (5.3.1)
+      logger
     mini_mime (1.1.5)
     minitest (5.25.5)
     msgpack (1.8.0)
+    multipart-post (2.4.1)
     mutex_m (0.3.0)
+    net-http (0.6.0)
+      uri
     net-imap (0.5.10)
       date
       net-protocol
@@ -190,6 +223,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.9-x86_64-linux-musl)
       racc (~> 1.4)
+    number_to_words (1.2.1)
     orm_adapter (0.5.0)
     ostruct (0.6.3)
     pg (1.6.1)
@@ -259,6 +293,9 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.4.2)
+    ruby-vips (2.2.5)
+      ffi (~> 1.12)
+      logger
     rubyzip (3.0.2)
     securerandom (0.4.1)
     selenium-webdriver (4.35.0)
@@ -288,6 +325,7 @@ GEM
       railties (>= 7.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    uri (1.0.3)
     warden (1.2.9)
       rack (>= 2.0.9)
     web-console (4.2.1)
@@ -321,16 +359,21 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
+  activestorage-cloudinary-service
   annotate
+  bigdecimal
   bootsnap
   capybara
+  cloudinary
   cssbundling-rails
   debug
   devise
   dotenv-rails
+  image_processing (~> 1.2)
   jbuilder
   jsbundling-rails
   letter_opener_web
+  number_to_words
   pg (~> 1.1)
   puma (>= 5.0)
   pundit

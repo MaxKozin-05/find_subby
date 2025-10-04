@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_09_20_042347) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_28_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -60,6 +60,17 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_20_042347) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "job_blocks", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "job_id", null: false
+    t.date "starts_on", null: false
+    t.date "ends_on", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_id"], name: "index_job_blocks_on_job_id"
+    t.index ["user_id"], name: "index_job_blocks_on_user_id"
+  end
+
   create_table "jobs", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "client_name", null: false
@@ -73,6 +84,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_20_042347) do
     t.text "location"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "starts_on"
+    t.date "ends_on"
+    t.boolean "calendar_blocked", default: false, null: false
     t.index ["user_id"], name: "index_jobs_on_user_id"
   end
 
@@ -119,6 +133,41 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_20_042347) do
     t.index ["profile_id"], name: "index_projects_on_profile_id"
   end
 
+  create_table "quote_items", force: :cascade do |t|
+    t.bigint "quote_id", null: false
+    t.string "description", null: false
+    t.decimal "quantity", precision: 10, scale: 2, default: "1.0", null: false
+    t.string "unit", default: "each"
+    t.decimal "unit_price", precision: 10, scale: 2, null: false
+    t.integer "category", null: false
+    t.integer "position", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_quote_items_on_category"
+    t.index ["position"], name: "index_quote_items_on_position"
+    t.index ["quote_id"], name: "index_quote_items_on_quote_id"
+  end
+
+  create_table "quotes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "job_id"
+    t.string "title", null: false
+    t.text "description"
+    t.integer "status", default: 0, null: false
+    t.integer "pricing_model", default: 0, null: false
+    t.integer "version", default: 1, null: false
+    t.bigint "parent_quote_id"
+    t.boolean "gst_enabled", default: false, null: false
+    t.decimal "gst_rate", precision: 5, scale: 4, default: "0.1"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_id"], name: "index_quotes_on_job_id"
+    t.index ["parent_quote_id"], name: "index_quotes_on_parent_quote_id"
+    t.index ["status"], name: "index_quotes_on_status"
+    t.index ["user_id"], name: "index_quotes_on_user_id"
+    t.index ["version"], name: "index_quotes_on_version"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -137,8 +186,14 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_20_042347) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "calendar_days", "users"
+  add_foreign_key "job_blocks", "jobs"
+  add_foreign_key "job_blocks", "users"
   add_foreign_key "jobs", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "profiles", "users"
   add_foreign_key "projects", "profiles"
+  add_foreign_key "quote_items", "quotes"
+  add_foreign_key "quotes", "jobs"
+  add_foreign_key "quotes", "quotes", column: "parent_quote_id"
+  add_foreign_key "quotes", "users"
 end
